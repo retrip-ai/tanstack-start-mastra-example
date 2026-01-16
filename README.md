@@ -139,13 +139,18 @@ flowchart TD
         📦 @mastra/ai-sdk/ui
         Converts Mastra → AI SDK format"]
         
+        ResolveMsg["resolveInitialMessages()
+        Resolves network messages
+        from memory storage"]
+        
         FilterMsg["filterDisplayableMessages()
         Custom filter function
         Removes: completion checks,
                  network JSON,
-                 empty messages"]
+                 empty messages,
+                 reasoning (history only)"]
         
-        RenderPart["renderPart()
+        RenderPart["MessagePartRenderer
         Switch by part.type:
         - text → MessageResponse
         - reasoning → Reasoning
@@ -202,7 +207,8 @@ flowchart TD
         UseQuery -->|calls| UseMastraClient
         UseMastraClient -->|listThreadMessages| LibSQL
         LibSQL -->|returns| ToAISdk
-        ToAISdk -->|converts| FilterMsg
+        ToAISdk -->|converts| ResolveMsg
+        ResolveMsg -->|resolves| FilterMsg
         FilterMsg -->|setMessages| Messages
     end
     
@@ -233,17 +239,18 @@ flowchart TD
 
 1. `useQuery()` + `useMastraClient()` → `listThreadMessages()`
 2. `toAISdkV5Messages()` converts Mastra format → AI SDK format
-3. `filterDisplayableMessages()` removes internal system messages
-4. `setMessages()` sets chat history
+3. `resolveInitialMessages()` resolves network execution data from memory
+4. `filterDisplayableMessages()` removes internal system messages and reasoning from history
+5. `setMessages()` sets chat history
 
 ### 🎨 Rendering
 
-`renderPart()` function switches on `part.type`:
+`MessagePartRenderer` component switches on `part.type`:
 
 * **text** → `<MessageResponse>`
 * **data-network** → `<NetworkExecution>` (shows routing decisions)
 * **tool-**\* → `<Tool>` (parameters and results)
-* **reasoning** → `<Reasoning>` (model thoughts)
+* **reasoning** → `<Reasoning>` (model thoughts, only during streaming)
 
 ## Project Structure
 
@@ -255,10 +262,26 @@ src/
 │   │   ├── tool.tsx              # Tool call display
 │   │   ├── reasoning.tsx         # Model reasoning display
 │   │   └── ...
+│   ├── chat/               # Chat-specific components
+│   │   ├── chat-empty-state.tsx  # Empty state UI
+│   │   ├── chat-input.tsx        # Message input with actions
+│   │   ├── chat-layout.tsx       # Chat page layout wrapper
+│   │   ├── message-part-renderer.tsx  # Renders message parts by type
+│   │   └── index.ts              # Barrel exports
 │   └── ui/                 # shadcn/ui components
+├── hooks/
+│   ├── use-chat-navigation.ts    # Navigate to chat with initial message
+│   ├── use-delete-thread.ts      # Delete thread mutation
+│   ├── use-invalidate-threads.ts # Invalidate threads query
+│   ├── use-thread-messages.ts    # Fetch thread messages
+│   └── use-threads.ts            # Fetch all threads
 ├── lib/
+│   ├── chat-utils.ts             # Chat utility functions
+│   ├── constants.ts              # Environment variables
 │   ├── filter-displayable-messages.ts  # Filter system messages
-│   └── constants.ts        # Environment variables
+│   ├── mastra-queries.ts         # Centralized query options & keys
+│   ├── resolve-initial-messages.ts     # Resolve network messages from memory
+│   └── utils.ts                  # General utilities
 ├── mastra/
 │   ├── agents/             # AI agents
 │   │   ├── routing-agent.ts      # Main routing logic
