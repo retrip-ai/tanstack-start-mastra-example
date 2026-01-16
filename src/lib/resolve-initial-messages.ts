@@ -1,4 +1,5 @@
 import type { UIMessage } from '@ai-sdk/react';
+import { isNetworkMessage } from '@/lib/utils';
 
 // Type definitions for parsing network execution data
 
@@ -70,7 +71,7 @@ export const resolveInitialMessages = (messages: UIMessage[]): UIMessage[] => {
 				part.type === 'text' &&
 				'text' in part &&
 				typeof part.text === 'string' &&
-				part.text.includes('"isNetwork":true')
+				isNetworkMessage(part.text)
 		);
 
 		if (networkPart && networkPart.type === 'text') {

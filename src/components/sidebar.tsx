@@ -56,18 +56,18 @@ export function Sidebar() {
 						threads.map((thread: { id: string; title?: string; createdAt?: string }) => (
 							<Link
 								className={cn(
-									'group flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted',
+									'group flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted',
 									currentThreadId === thread.id && 'bg-accent text-accent-foreground'
 								)}
 								key={thread.id}
 								params={{ threadId: thread.id }}
 								to="/chat/$threadId"
 							>
-								<div className="flex min-w-0 flex-1 items-center gap-2">
+								<div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
 									<MessageSquareIcon className="size-4 shrink-0 text-muted-foreground" />
 									<div className="min-w-0 flex-1">
 										<p className="truncate font-medium">{thread.title || 'Untitled'}</p>
-										<p className="text-xs text-muted-foreground">
+										<p className="truncate text-xs text-muted-foreground">
 											{thread.createdAt
 												? formatDistanceToNow(new Date(thread.createdAt), {
 														addSuffix: true,

@@ -12,6 +12,15 @@ import { filterDisplayableMessages } from '@/lib/filter-displayable-messages';
 import { resolveInitialMessages } from '@/lib/resolve-initial-messages';
 
 /**
+ * Query keys centralizadas para evitar duplicación
+ * Usar estas funciones en lugar de hardcodear las keys
+ */
+export const mastraQueryKeys = {
+	threads: (resourceId: string) => ['mastra', 'threads', resourceId] as const,
+	messages: (threadId: string) => ['mastra', 'messages', threadId] as const,
+};
+
+/**
  * Crear cliente Mastra (singleton pattern)
  */
 let mastraClientInstance: MastraClient | null = null;
@@ -28,7 +37,7 @@ export function createMastraClient() {
  * @returns Query options para usar con useQuery, useSuspenseQuery, prefetchQuery o ensureQueryData
  */
 export const threadsQueryOptions = () => ({
-	queryKey: ['mastra', 'threads', RESOURCE_ID] as const,
+	queryKey: mastraQueryKeys.threads(RESOURCE_ID),
 	queryFn: async () => {
 		const client = createMastraClient();
 		const result = await client.listMemoryThreads({
@@ -50,7 +59,7 @@ export const threadsQueryOptions = () => ({
  * @returns Query options para usar con useQuery, useSuspenseQuery, prefetchQuery o ensureQueryData
  */
 export const threadMessagesQueryOptions = (threadId: string) => ({
-	queryKey: ['mastra', 'messages', threadId] as const,
+	queryKey: mastraQueryKeys.messages(threadId),
 	queryFn: async () => {
 		if (!threadId) return { exists: false, messages: [] };
 
@@ -67,13 +76,13 @@ export const threadMessagesQueryOptions = (threadId: string) => ({
 				return { exists: true, messages: [] };
 			}
 
-		// Convertir a formato AI SDK V5
-		const uiMessages = toAISdkV5Messages(result.messages) as MastraUIMessage[];
-		// Resolver mensajes de network desde memoria
-		const resolvedMessages = resolveInitialMessages(uiMessages);
-		const displayableMessages = filterDisplayableMessages(resolvedMessages);
+			// Convertir a formato AI SDK V5
+			const uiMessages = toAISdkV5Messages(result.messages) as MastraUIMessage[];
+			// Resolver mensajes de network desde memoria
+			const resolvedMessages = resolveInitialMessages(uiMessages);
+			const displayableMessages = filterDisplayableMessages(resolvedMessages);
 
-		return { exists: true, messages: displayableMessages };
+			return { exists: true, messages: displayableMessages };
 		} catch (error) {
 			// Solo devolver exists: false si es un error 404 (thread no existe)
 			const is404 =

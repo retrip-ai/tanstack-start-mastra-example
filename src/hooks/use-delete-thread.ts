@@ -1,6 +1,7 @@
 import { useMastraClient } from '@mastra/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AGENT_ID, RESOURCE_ID } from '@/lib/constants';
+import { mastraQueryKeys } from '@/lib/mastra-queries';
 
 /**
  * Hook para eliminar un thread
@@ -18,7 +19,7 @@ export const useDeleteThread = () => {
 		onSuccess: () => {
 			// Invalidar queries de threads para refrescar la lista
 			queryClient.invalidateQueries({
-				queryKey: ['mastra', 'threads', RESOURCE_ID],
+				queryKey: mastraQueryKeys.threads(RESOURCE_ID),
 			});
 		},
 		onError: (error) => {
