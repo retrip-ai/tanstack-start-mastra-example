@@ -1,12 +1,16 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
 import { useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { DefaultChatTransport } from "ai";
+import { GlobeIcon } from "lucide-react";
+import { nanoid } from "nanoid";
+import { useCallback, useMemo, useState } from "react";
 import {
 	Conversation,
 	ConversationContent,
 	ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
+import { Loader } from "@/components/ai-elements/loader";
 import {
 	Message,
 	MessageContent,
@@ -14,18 +18,19 @@ import {
 } from "@/components/ai-elements/message";
 import {
 	PromptInput,
+	PromptInputActionAddAttachments,
+	PromptInputActionMenu,
+	PromptInputActionMenuContent,
+	PromptInputActionMenuTrigger,
 	PromptInputBody,
+	PromptInputButton,
 	PromptInputFooter,
 	PromptInputSubmit,
 	PromptInputTextarea,
 	PromptInputTools,
-	PromptInputButton,
 } from "@/components/ai-elements/prompt-input";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
-import { Loader } from "@/components/ai-elements/loader";
 import { ChatHistory } from "@/components/chat-history";
-import { useState, useCallback, useMemo } from "react";
-import { nanoid } from "nanoid";
 import { MASTRA_BASE_URL } from "@/lib/constants";
 
 const AGENT_ID = "routing-agent";
@@ -208,10 +213,15 @@ function HomePage() {
 							</PromptInputBody>
 							<PromptInputFooter>
 								<PromptInputTools>
-									<PromptInputButton variant="ghost" disabled>
-										<span className="text-xs text-muted-foreground">
-											Powered by Mastra
-										</span>
+									<PromptInputActionMenu>
+										<PromptInputActionMenuTrigger />
+										<PromptInputActionMenuContent>
+											<PromptInputActionAddAttachments />
+										</PromptInputActionMenuContent>
+									</PromptInputActionMenu>
+									<PromptInputButton>
+										<GlobeIcon size={16} />
+										<span>Search</span>
 									</PromptInputButton>
 								</PromptInputTools>
 								<PromptInputSubmit
