@@ -18,6 +18,7 @@ import {
 	MessageContent,
 } from '@/components/ai-elements/message';
 import { ChatEmptyState, ChatInput, ChatLayout, MessagePartRenderer } from '@/components/chat';
+import { useConversationUsage } from '@/hooks/use-conversation-usage';
 import { useInvalidateThreads } from '@/hooks/use-invalidate-threads';
 import { getMessageText, hasRenderableContent } from '@/lib/chat-utils';
 import { MASTRA_BASE_URL, RESOURCE_ID } from '@/lib/constants';
@@ -96,6 +97,9 @@ function ChatPage() {
 			},
 		}),
 	});
+
+	// Calcular el uso de contexto de la conversación
+	const contextUsage = useConversationUsage(messages);
 
 	// Enviar mensaje inicial si viene del estado de navegación
 	useEffect(() => {
@@ -183,7 +187,9 @@ function ChatPage() {
 
 			<div className="grid shrink-0 gap-4 pt-4">
 				<ChatInput
+					contextUsage={contextUsage}
 					disabled={!inputValue.trim() || status === 'streaming'}
+					messagesCount={messages.length}
 					onChange={setInputValue}
 					onSubmit={handleSubmit}
 					status={status}

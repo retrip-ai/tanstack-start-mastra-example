@@ -1,4 +1,5 @@
 import { GlobeIcon } from 'lucide-react';
+import { Context, ContextContent, ContextTrigger } from '@/components/ai-elements/context';
 import {
 	PromptInput,
 	PromptInputActionAddAttachments,
@@ -20,6 +21,11 @@ interface ChatInputProps {
 	disabled?: boolean;
 	status?: 'ready' | 'streaming' | 'submitted' | 'error';
 	placeholder?: string;
+	contextUsage?: {
+		totalTokens: number;
+		maxTokens: number;
+	};
+	messagesCount?: number;
 }
 
 export function ChatInput({
@@ -29,6 +35,8 @@ export function ChatInput({
 	disabled,
 	status = 'ready',
 	placeholder = 'Ask about travel destinations...',
+	contextUsage,
+	messagesCount = 0,
 }: ChatInputProps) {
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -61,7 +69,35 @@ export function ChatInput({
 							<span>Search</span>
 						</PromptInputButton>
 					</PromptInputTools>
-					<PromptInputSubmit disabled={disabled} status={status} />
+
+					<div className="flex items-center gap-2 ml-auto">
+						{/* Context usage - solo mostrar si hay más de un mensaje */}
+						{contextUsage && messagesCount > 1 && contextUsage.totalTokens > 0 && (
+							<Context maxTokens={contextUsage.maxTokens} usedTokens={contextUsage.totalTokens}>
+								<ContextTrigger />
+								<ContextContent>
+									<div className="p-3">
+										<div className="flex items-center justify-between gap-3 text-xs">
+											<span className="font-medium text-muted-foreground">
+												{new Intl.NumberFormat('en-US', {
+													notation: 'compact',
+													maximumFractionDigits: 1,
+												}).format(contextUsage.totalTokens)}{' '}
+												/{' '}
+												{new Intl.NumberFormat('en-US', {
+													notation: 'compact',
+													maximumFractionDigits: 0,
+												}).format(contextUsage.maxTokens)}{' '}
+												context used
+											</span>
+										</div>
+									</div>
+								</ContextContent>
+							</Context>
+						)}
+
+						<PromptInputSubmit disabled={disabled} status={status} />
+					</div>
 				</PromptInputFooter>
 			</PromptInput>
 		</form>

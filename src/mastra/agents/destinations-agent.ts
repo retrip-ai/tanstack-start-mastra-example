@@ -1,3 +1,4 @@
+import { google } from '@ai-sdk/google';
 import { Agent } from '@mastra/core/agent';
 import { memory } from '../memory';
 import { destinationsSearchTool } from '../tools/destinations-tool';
@@ -35,7 +36,7 @@ export const destinationsAgent = new Agent({
       Always consider that the user might want to combine your information with weather data
       to make a better decision.
 `,
-	model: 'google/gemini-2.5-flash',
+	model: google('gemini-2.5-flash'),
 	tools: { destinationsSearchTool },
 	memory,
 });

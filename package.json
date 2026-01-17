@@ -17,6 +17,7 @@
     "format": "biome format --write ."
   },
   "dependencies": {
+    "@ai-sdk/google": "2.0.52",
     "@ai-sdk/react": "2.0.123",
     "@hookform/resolvers": "^5.2.2",
     "@mastra/ai-sdk": "1.0.0-beta.15",

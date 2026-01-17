@@ -1,3 +1,4 @@
+import { google } from '@ai-sdk/google';
 import { Agent } from '@mastra/core/agent';
 import { memory } from '../memory';
 import { destinationsAgent } from './destinations-agent';
@@ -45,7 +46,7 @@ export const routingAgent = new Agent({
       Always be friendly, enthusiastic about travel, and help the user
       make the best decision for their next adventure.
 `,
-	model: 'google/gemini-2.5-flash',
+	model: google('gemini-2.5-flash-lite'),
 	agents: {
 		weatherAgent,
 		destinationsAgent,
