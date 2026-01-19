@@ -26,6 +26,21 @@ export function getMessageText(message: UIMessage): string {
 }
 
 /**
+ * Extrae el texto de un part tipo data-network
+ * @param part - Part del mensaje
+ * @returns Texto del campo output si existe
+ */
+export function getTextFromNetworkPart(part: {
+	type: string;
+	data?: { output?: string };
+}): string | undefined {
+	if (part.type === 'data-network' && part.data?.output) {
+		return part.data.output;
+	}
+	return undefined;
+}
+
+/**
  * Verifica si un mensaje tiene contenido renderizable
  * @param message - Mensaje del chat
  * @returns true si el mensaje tiene contenido para mostrar

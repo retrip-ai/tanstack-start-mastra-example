@@ -1,7 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import { createFileRoute, redirect, useNavigate, useRouterState } from '@tanstack/react-router';
 import { DefaultChatTransport } from 'ai';
-import { CopyIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
@@ -13,14 +12,11 @@ import {
 import { Loader } from '@/components/ai-elements/loader';
 import {
 	Message,
-	MessageAction,
-	MessageActions,
 	MessageContent,
 } from '@/components/ai-elements/message';
 import { ChatEmptyState, ChatInput, ChatLayout, MessagePartRenderer } from '@/components/chat';
-import { useConversationUsage } from '@/hooks/use-conversation-usage';
 import { useInvalidateThreads } from '@/hooks/use-invalidate-threads';
-import { getMessageText, hasRenderableContent } from '@/lib/chat-utils';
+import { hasRenderableContent } from '@/lib/chat-utils';
 import { MASTRA_BASE_URL, RESOURCE_ID } from '@/lib/constants';
 import { threadMessagesQueryOptions } from '@/lib/mastra-queries';
 
@@ -98,9 +94,6 @@ function ChatPage() {
 		}),
 	});
 
-	// Calcular el uso de contexto de la conversación
-	const contextUsage = useConversationUsage(messages);
-
 	// Enviar mensaje inicial si viene del estado de navegación
 	useEffect(() => {
 		if (isNewChat && initialMessage && !initialMessageSentRef.current && status !== 'streaming') {
@@ -131,10 +124,6 @@ function ChatPage() {
 		invalidateThreads();
 	};
 
-	const handleCopy = (text: string) => {
-		navigator.clipboard.writeText(text);
-	};
-
 	return (
 		<ChatLayout>
 			<Conversation className="flex-1">
@@ -149,28 +138,22 @@ function ChatPage() {
 							return (
 								<Message from={message.role} key={message.id}>
 									<MessageContent>
-										{message.parts.map((part, partIndex) => (
-											<MessagePartRenderer
-												isLastMessage={index === messages.length - 1}
-												key={partIndex}
-												part={part}
-												partIndex={partIndex}
-												status={status}
-											/>
-										))}
+										{message.parts.map((part, partIndex) => {
+											const hasTextPart = message.parts.some(
+												(p) => p.type === 'text' && 'text' in p && (p.text as string)?.trim(),
+											);
+											return (
+												<MessagePartRenderer
+													hasTextPart={hasTextPart}
+													isLastMessage={index === messages.length - 1}
+													key={partIndex}
+													part={part}
+													partIndex={partIndex}
+													status={status}
+												/>
+											);
+										})}
 									</MessageContent>
-									{message.role === 'assistant' &&
-										status === 'ready' &&
-										index === messages.length - 1 && (
-											<MessageActions>
-												<MessageAction
-													onClick={() => handleCopy(getMessageText(message as any))}
-													tooltip="Copy"
-												>
-													<CopyIcon className="size-3" />
-												</MessageAction>
-											</MessageActions>
-										)}
 								</Message>
 							);
 						})
@@ -187,9 +170,7 @@ function ChatPage() {
 
 			<div className="grid shrink-0 gap-4 pt-4">
 				<ChatInput
-					contextUsage={contextUsage}
 					disabled={!inputValue.trim() || status === 'streaming'}
-					messagesCount={messages.length}
 					onChange={setInputValue}
 					onSubmit={handleSubmit}
 					status={status}

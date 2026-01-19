@@ -80,6 +80,7 @@ export const threadMessagesQueryOptions = (threadId: string) => ({
 			const uiMessages = toAISdkV5Messages(result.messages) as MastraUIMessage[];
 			// Resolver mensajes de network desde memoria
 			const resolvedMessages = resolveInitialMessages(uiMessages);
+			// Filtrar mensajes no displayables (y duplicados de network)
 			const displayableMessages = filterDisplayableMessages(resolvedMessages);
 
 			return { exists: true, messages: displayableMessages };

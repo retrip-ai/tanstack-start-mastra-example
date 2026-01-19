@@ -8,9 +8,10 @@ import { getTextFromPart, isNetworkMessage } from '@/lib/utils';
  * - Network execution JSON messages
  * - Messages with no displayable content
  * - Reasoning parts (only shown during streaming, not in history)
+ * - Duplicate consecutive assistant messages with dynamic-tool (keeps only the last one)
  */
 export function filterDisplayableMessages(messages: UIMessage[]): UIMessage[] {
-	return messages
+	const filteredMessages = messages
 		.map((message) => {
 			// Remove reasoning parts from historical messages
 			// Reasoning should only be shown during streaming
@@ -86,4 +87,47 @@ export function filterDisplayableMessages(messages: UIMessage[]): UIMessage[] {
 
 			return hasDisplayableContent;
 		});
+
+	// Remove duplicate consecutive assistant messages with dynamic-tool
+	// Also remove text-only assistant messages that follow a dynamic-tool
+	const deduplicatedMessages: UIMessage[] = [];
+	let i = 0;
+	
+	while (i < filteredMessages.length) {
+		const currentMessage = filteredMessages[i];
+		
+		// If it's an assistant message with dynamic-tool
+		if (
+			currentMessage.role === 'assistant' &&
+			currentMessage.parts.some((p) => p.type === 'dynamic-tool')
+		) {
+			let lastRelevantIndex = i;
+			
+			// Look ahead for consecutive assistant messages
+			while (lastRelevantIndex + 1 < filteredMessages.length) {
+				const nextMessage = filteredMessages[lastRelevantIndex + 1];
+				
+				// Skip if next is also assistant with dynamic-tool or text-only
+				if (nextMessage.role === 'assistant') {
+					const hasDynamicTool = nextMessage.parts.some((p) => p.type === 'dynamic-tool');
+					const hasOnlyText = nextMessage.parts.every((p) => p.type === 'text');
+					
+					if (hasDynamicTool || hasOnlyText) {
+						lastRelevantIndex++;
+						continue;
+					}
+				}
+				break;
+			}
+			
+			// Keep only the first dynamic-tool message (has the complete info)
+			deduplicatedMessages.push(currentMessage);
+			i = lastRelevantIndex + 1;
+		} else {
+			deduplicatedMessages.push(currentMessage);
+			i++;
+		}
+	}
+
+	return deduplicatedMessages;
 }

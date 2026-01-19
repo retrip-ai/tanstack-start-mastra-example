@@ -1,34 +1,3 @@
-import { Button } from '@/components/ui/button';
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandList,
-	CommandSeparator,
-} from '@/components/ui/command';
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupButton,
-	InputGroupTextarea,
-} from '@/components/ui/input-group';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import type { ChatStatus, FileUIPart } from 'ai';
 import {
 	CornerDownLeftIcon,
@@ -62,6 +31,37 @@ import {
 	useRef,
 	useState,
 } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandSeparator,
+} from '@/components/ui/command';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupTextarea,
+} from '@/components/ui/input-group';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 // ============================================================================
 // Provider Context & Types
@@ -136,7 +136,7 @@ export function PromptInputProvider({
 	// ----- attachments state (global when wrapped)
 	const [attachmentFiles, setAttachmentFiles] = useState<(FileUIPart & { id: string })[]>([]);
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
-	const openRef = useRef<() => void>(() => {});
+	const openRef = useRef<() => void>(() => { });
 
 	const add = useCallback((files: File[] | FileList) => {
 		const incoming = Array.from(files);
@@ -669,9 +669,9 @@ export const PromptInput = ({
 		const text = usingProvider
 			? controller.textInput.value
 			: (() => {
-					const formData = new FormData(form);
-					return (formData.get('message') as string) || '';
-				})();
+				const formData = new FormData(form);
+				return (formData.get('message') as string) || '';
+			})();
 
 		// Reset form immediately after capturing text to avoid race condition
 		// where user input during async blob conversion would be lost
@@ -834,15 +834,15 @@ export const PromptInputTextarea = ({
 
 	const controlledProps = controller
 		? {
-				value: controller.textInput.value,
-				onChange: (e: ChangeEvent<HTMLTextAreaElement>) => {
-					controller.textInput.setInput(e.currentTarget.value);
-					onChange?.(e);
-				},
-			}
+			value: controller.textInput.value,
+			onChange: (e: ChangeEvent<HTMLTextAreaElement>) => {
+				controller.textInput.setInput(e.currentTarget.value);
+				onChange?.(e);
+			},
+		}
 		: {
-				onChange,
-			};
+			onChange,
+		};
 
 	return (
 		<InputGroupTextarea

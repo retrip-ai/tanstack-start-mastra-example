@@ -1,5 +1,4 @@
 import { GlobeIcon } from 'lucide-react';
-import { Context, ContextContent, ContextTrigger } from '@/components/ai-elements/context';
 import {
 	PromptInput,
 	PromptInputActionAddAttachments,
@@ -35,8 +34,6 @@ export function ChatInput({
 	disabled,
 	status = 'ready',
 	placeholder = 'Ask about travel destinations...',
-	contextUsage,
-	messagesCount = 0,
 }: ChatInputProps) {
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -47,7 +44,7 @@ export function ChatInput({
 
 	return (
 		<form onSubmit={onSubmit}>
-			<PromptInput onSubmit={() => {}}>
+			<PromptInput onSubmit={() => { }}>
 				<PromptInputBody>
 					<PromptInputTextarea
 						onChange={(e) => onChange(e.target.value)}
@@ -70,34 +67,7 @@ export function ChatInput({
 						</PromptInputButton>
 					</PromptInputTools>
 
-					<div className="flex items-center gap-2 ml-auto">
-						{/* Context usage - solo mostrar si hay más de un mensaje */}
-						{contextUsage && messagesCount > 1 && contextUsage.totalTokens > 0 && (
-							<Context maxTokens={contextUsage.maxTokens} usedTokens={contextUsage.totalTokens}>
-								<ContextTrigger />
-								<ContextContent>
-									<div className="p-3">
-										<div className="flex items-center justify-between gap-3 text-xs">
-											<span className="font-medium text-muted-foreground">
-												{new Intl.NumberFormat('en-US', {
-													notation: 'compact',
-													maximumFractionDigits: 1,
-												}).format(contextUsage.totalTokens)}{' '}
-												/{' '}
-												{new Intl.NumberFormat('en-US', {
-													notation: 'compact',
-													maximumFractionDigits: 0,
-												}).format(contextUsage.maxTokens)}{' '}
-												context used
-											</span>
-										</div>
-									</div>
-								</ContextContent>
-							</Context>
-						)}
-
-						<PromptInputSubmit disabled={disabled} status={status} />
-					</div>
+					<PromptInputSubmit disabled={disabled} status={status} />
 				</PromptInputFooter>
 			</PromptInput>
 		</form>

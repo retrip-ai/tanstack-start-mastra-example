@@ -19,6 +19,7 @@ interface MessagePartRendererProps {
 	partIndex: number;
 	isLastMessage: boolean;
 	status: 'ready' | 'streaming' | 'submitted' | 'error';
+	hasTextPart: boolean;
 }
 
 export function MessagePartRenderer({
@@ -26,6 +27,7 @@ export function MessagePartRenderer({
 	partIndex,
 	isLastMessage,
 	status,
+	hasTextPart,
 }: MessagePartRendererProps) {
 	// Text content
 	if (part.type === 'text' && 'text' in part) {
@@ -59,6 +61,29 @@ export function MessagePartRenderer({
 			| { task: { reason: string } }
 			| undefined;
 		const reasoningText = stepWithTask?.task?.reason;
+
+		// Solo aplicar fallback si:
+		// 1. No hay text part en el mensaje
+		// 2. El stream termino (status === 'ready')
+		// 3. Es el ultimo mensaje (isLastMessage === true)
+		// 4. El data-network tiene output
+		if (!hasTextPart && status === 'ready' && isLastMessage && networkData.output) {
+			return (
+				<div className="space-y-2" key={partIndex}>
+					{/* Mostrar reasoning si existe */}
+					{reasoningText && (
+						<Reasoning isStreaming={false}>
+							<ReasoningTrigger />
+							<ReasoningContent>{reasoningText}</ReasoningContent>
+						</Reasoning>
+					)}
+					{/* NetworkExecution para detalles técnicos */}
+					<NetworkExecution data={networkData} isStreaming={false} />
+					{/* Mostrar el texto de la respuesta al final */}
+					<MessageResponse>{String(networkData.output)}</MessageResponse>
+				</div>
+			);
+		}
 
 		return (
 			<div className="space-y-2" key={partIndex}>
