@@ -136,3 +136,87 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+/* Streaming border animation - Técnica @property con background-clip */
+/* Basado en: https://ibelick.com/blog/create-animated-gradient-borders-with-css */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.streaming-border {
+  position: relative;
+  isolation: isolate;
+}
+
+.streaming-border > form {
+  position: relative;
+  z-index: 1;
+}
+
+.streaming-border > form > * {
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  background: 
+    linear-gradient(var(--background), var(--background)) padding-box,
+    conic-gradient(
+      from var(--angle),
+      transparent 0deg,
+      transparent 60deg,
+      #2ec4b6 120deg,
+      #b9fbc0 180deg,
+      #2ec4b6 240deg,
+      transparent 300deg,
+      transparent 360deg
+    ) border-box;
+  animation: streaming-rotate 2s linear infinite;
+}
+
+.dark .streaming-border > form > * {
+  background: 
+    linear-gradient(var(--background), var(--background)) padding-box,
+    conic-gradient(
+      from var(--angle),
+      transparent 0deg,
+      transparent 60deg,
+      #2ec4b6 120deg,
+      #b9fbc0 180deg,
+      #2ec4b6 240deg,
+      transparent 300deg,
+      transparent 360deg
+    ) border-box;
+}
+
+@keyframes streaming-rotate {
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* Efecto glow adicional debajo del input */
+.streaming-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 0.5rem;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0deg,
+    transparent 60deg,
+    rgba(46, 196, 182, 0.5) 120deg,
+    rgba(185, 251, 192, 0.5) 180deg,
+    rgba(46, 196, 182, 0.5) 240deg,
+    transparent 300deg,
+    transparent 360deg
+  );
+  filter: blur(12px);
+  opacity: 0.6;
+  z-index: 0;
+  animation: streaming-rotate 2s linear infinite;
+  pointer-events: none;
+}
+
+.dark .streaming-border::before {
+  opacity: 0.8;
+}

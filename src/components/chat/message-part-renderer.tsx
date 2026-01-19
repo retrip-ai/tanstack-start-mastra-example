@@ -20,6 +20,10 @@ interface MessagePartRendererProps {
 	isLastMessage: boolean;
 	status: 'ready' | 'streaming' | 'submitted' | 'error';
 	hasTextPart: boolean;
+	allParts: Array<{
+		type: string;
+		[key: string]: unknown;
+	}>;
 }
 
 export function MessagePartRenderer({
@@ -28,11 +32,25 @@ export function MessagePartRenderer({
 	isLastMessage,
 	status,
 	hasTextPart,
+	allParts,
 }: MessagePartRendererProps) {
 	// Text content
 	if (part.type === 'text' && 'text' in part) {
 		const text = part.text as string;
 		if (!text || text.trim() === '') return null;
+
+		// Durante streaming, verificar si este texto es el razonamiento duplicado
+		if (status === 'streaming' && isLastMessage) {
+			const networkPart = allParts.find((p) => p.type === 'data-network') as any;
+			const reasoningText = networkPart?.data?.steps?.find((s: any) => s.task?.reason)?.task
+				?.reason;
+
+			// Si el texto coincide con el reasoning, no renderizarlo (ya está en Reasoning component)
+			if (reasoningText && text === reasoningText) {
+				return null;
+			}
+		}
+
 		return <MessageResponse key={partIndex}>{text}</MessageResponse>;
 	}
 

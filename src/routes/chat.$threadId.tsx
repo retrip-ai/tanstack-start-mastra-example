@@ -1,5 +1,6 @@
 import { useChat } from '@ai-sdk/react';
 import { createFileRoute, redirect, useNavigate, useRouterState } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { DefaultChatTransport } from 'ai';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +10,6 @@ import {
 	ConversationContent,
 	ConversationScrollButton,
 } from '@/components/ai-elements/conversation';
-import { Loader } from '@/components/ai-elements/loader';
 import {
 	Message,
 	MessageContent,
@@ -60,16 +60,24 @@ function ChatPage() {
 	const { threadId } = Route.useParams();
 	const { new: isNewChat } = Route.useSearch();
 	const loaderData = Route.useLoaderData();
-	const initialMessages = loaderData.initialMessages;
 	const routerState = useRouterState();
 	const [inputValue, setInputValue] = useState('');
 	const initialMessageSentRef = useRef(false);
 	const navigate = useNavigate();
-	const { invalidateThreads } = useInvalidateThreads();
+	const { invalidateThreads, invalidateThreadMessages } = useInvalidateThreads();
 
 	// Obtener el mensaje inicial del estado de navegación
 	const initialMessage = (routerState.location.state as { initialMessage?: string })
 		?.initialMessage;
+
+	// Usar useQuery para obtener mensajes frescos al navegar de vuelta
+	const { data: freshMessages } = useQuery({
+		...threadMessagesQueryOptions(threadId),
+		enabled: !isNewChat, // Solo para chats existentes
+	});
+
+	// Usar freshMessages si están disponibles, sino usar initialMessages del loader
+	const initialMessages = freshMessages?.messages || loaderData.initialMessages;
 
 	const { messages, sendMessage, status } = useChat({
 		id: threadId,
@@ -108,10 +116,11 @@ function ChatPage() {
 				replace: true,
 			});
 
-			// Invalidar threads después de enviar mensaje
+			// Invalidar threads y messages después de enviar mensaje
 			invalidateThreads();
+			invalidateThreadMessages(threadId);
 		}
-	}, [isNewChat, initialMessage, status, sendMessage, navigate, threadId, invalidateThreads]);
+	}, [isNewChat, initialMessage, status, sendMessage, navigate, threadId, invalidateThreads, invalidateThreadMessages]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -120,8 +129,9 @@ function ChatPage() {
 		sendMessage({ text: inputValue });
 		setInputValue('');
 
-		// Invalidate threads after sending message
+		// Invalidar threads y messages después de enviar mensaje
 		invalidateThreads();
+		invalidateThreadMessages(threadId);
 	};
 
 	return (
@@ -150,6 +160,7 @@ function ChatPage() {
 													part={part}
 													partIndex={partIndex}
 													status={status}
+													allParts={message.parts}
 												/>
 											);
 										})}
@@ -157,12 +168,6 @@ function ChatPage() {
 								</Message>
 							);
 						})
-					)}
-					{status === 'streaming' && (
-						<div className="flex items-center gap-2 text-sm text-muted-foreground">
-							<Loader size={14} />
-							<span>Thinking...</span>
-						</div>
 					)}
 				</ConversationContent>
 				<ConversationScrollButton />

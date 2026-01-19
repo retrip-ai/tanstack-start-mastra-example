@@ -12,6 +12,7 @@ import {
 	PromptInputTextarea,
 	PromptInputTools,
 } from '@/components/ai-elements/prompt-input';
+import { cn } from '@/lib/utils';
 
 interface ChatInputProps {
 	value: string;
@@ -43,33 +44,35 @@ export function ChatInput({
 	};
 
 	return (
-		<form onSubmit={onSubmit}>
-			<PromptInput onSubmit={() => { }}>
-				<PromptInputBody>
-					<PromptInputTextarea
-						onChange={(e) => onChange(e.target.value)}
-						onKeyDown={handleKeyDown}
-						placeholder={placeholder}
-						value={value}
-					/>
-				</PromptInputBody>
-				<PromptInputFooter>
-					<PromptInputTools>
-						<PromptInputActionMenu>
-							<PromptInputActionMenuTrigger />
-							<PromptInputActionMenuContent>
-								<PromptInputActionAddAttachments />
-							</PromptInputActionMenuContent>
-						</PromptInputActionMenu>
-						<PromptInputButton>
-							<GlobeIcon size={16} />
-							<span>Search</span>
-						</PromptInputButton>
-					</PromptInputTools>
+		<div className={cn(status === 'streaming' && 'streaming-border')}>
+			<form onSubmit={onSubmit}>
+				<PromptInput onSubmit={() => { }}>
+					<PromptInputBody>
+						<PromptInputTextarea
+							onChange={(e) => onChange(e.target.value)}
+							onKeyDown={handleKeyDown}
+							placeholder={placeholder}
+							value={value}
+						/>
+					</PromptInputBody>
+					<PromptInputFooter>
+						<PromptInputTools>
+							<PromptInputActionMenu>
+								<PromptInputActionMenuTrigger />
+								<PromptInputActionMenuContent>
+									<PromptInputActionAddAttachments />
+								</PromptInputActionMenuContent>
+							</PromptInputActionMenu>
+							<PromptInputButton>
+								<GlobeIcon size={16} />
+								<span>Search</span>
+							</PromptInputButton>
+						</PromptInputTools>
 
-					<PromptInputSubmit disabled={disabled} status={status} />
-				</PromptInputFooter>
-			</PromptInput>
-		</form>
+						<PromptInputSubmit disabled={disabled} status={status} />
+					</PromptInputFooter>
+				</PromptInput>
+			</form>
+		</div>
 	);
 }

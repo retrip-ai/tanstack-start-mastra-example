@@ -103,4 +103,5 @@ export const threadMessagesQueryOptions = (threadId: string) => ({
 	gcTime: 0,
 	retry: false,
 	refetchOnWindowFocus: false,
+	refetchOnMount: 'always' as const,
 });
