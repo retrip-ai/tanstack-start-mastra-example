@@ -18,9 +18,25 @@ import { CodeBlock } from './code-block';
 import { Loader } from './loader';
 
 type NetworkData = NetworkDataPart['data'];
-type StepResult = NetworkData['steps'][number];
+type BaseStepResult = NetworkData['steps'][number];
 type NetworkStatus = NetworkData['status'];
-type StepStatus = StepResult['status'];
+
+// Extend the step type to include properties that might be missing in the SDK type
+interface ExtendedStepResult extends Omit<BaseStepResult, 'output'> {
+	id?: string;
+	task?: {
+		id?: string;
+		type?: string;
+		reason?: string;
+		toolResults?: Array<{
+			toolName?: string;
+			result?: unknown;
+		}>;
+	};
+	output?: unknown;
+}
+
+type StepStatus = BaseStepResult['status'];
 
 export type NetworkExecutionProps = ComponentProps<typeof Collapsible> & {
 	data: NetworkData;
@@ -34,6 +50,8 @@ const getStatusBadge = (status: NetworkStatus | StepStatus) => {
 		success: 'Success',
 		failed: 'Failed',
 		waiting: 'Waiting',
+		suspended: 'Suspended',
+		paused: 'Paused',
 	};
 
 	const icons: Record<NetworkStatus | StepStatus, ReactNode> = {
@@ -42,6 +60,8 @@ const getStatusBadge = (status: NetworkStatus | StepStatus) => {
 		success: <CheckCircleIcon className="size-3 text-green-600" />,
 		failed: <XCircleIcon className="size-3 text-red-600" />,
 		waiting: <ClockIcon className="size-3 text-muted-foreground" />,
+		suspended: <ClockIcon className="size-3 text-yellow-600" />,
+		paused: <ClockIcon className="size-3 text-yellow-600" />,
 	};
 
 	return (
@@ -77,13 +97,24 @@ export const NetworkExecution = ({
 
 			<CollapsibleContent className="data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in">
 				<div className="border-t p-4 space-y-3">
-					{data.steps.map((step, index) => (
-						<NetworkStep
-							isLast={index === data.steps.length - 1}
-							key={step.id || index}
-							step={step}
-						/>
-					))}
+					{data.steps
+						.filter((step, index) => {
+							// Hide first step if it is the routing-agent (redundant with top-level reasoning)
+							if (index === 0 && step.name === 'routing-agent') {
+								return false;
+							}
+							return true;
+						})
+						.map((step, index, array) => {
+							const extendedStep = step as ExtendedStepResult;
+							return (
+								<NetworkStep
+									isLast={index === array.length - 1}
+									key={extendedStep.id || index}
+									step={extendedStep}
+								/>
+							);
+						})}
 				</div>
 			</CollapsibleContent>
 		</Collapsible>
@@ -91,7 +122,7 @@ export const NetworkExecution = ({
 };
 
 type NetworkStepProps = {
-	step: StepResult;
+	step: ExtendedStepResult;
 	isLast: boolean;
 };
 
@@ -139,15 +170,17 @@ const NetworkStep = ({ step, isLast }: NetworkStepProps) => {
 								<Badge className="text-xs" variant="outline">
 									Target: {step.task.id}
 								</Badge>
-								<Badge className="text-xs" variant="outline">
-									Type: {step.task.type}
-								</Badge>
+								{step.task.type && (
+									<Badge className="text-xs" variant="outline">
+										Type: {String(step.task.type)}
+									</Badge>
+								)}
 							</div>
 						</div>
 					)}
 
 					{/* Expandable details */}
-					{(step.input || step.output) && (
+					{(!!step.input || !!step.output) && (
 						<button
 							className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
 							onClick={() => setIsExpanded(!isExpanded)}
@@ -172,7 +205,7 @@ const NetworkStep = ({ step, isLast }: NetworkStepProps) => {
 									</div>
 								</div>
 							)}
-							{step.output && (
+							{!!step.output && (
 								<div className="space-y-1">
 									<h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
 										Output

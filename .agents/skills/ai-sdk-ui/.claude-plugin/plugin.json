@@ -1,0 +1,12 @@
+{
+  "name": "ai-sdk-ui",
+  "description": "Build React chat interfaces with Vercel AI SDK v6. Covers useChat/useCompletion/useObject hooks, message parts structure, tool approval workflows, and 12 UI error solutions. Use when: implementing AI chat UIs, migrating v5→v6, troubleshooting useChat failed to parse stream, stale body values, or React update depth errors.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Dawes",
+    "email": "jeremy@jezweb.net"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jezweb/claude-skills",
+  "keywords": []
+}

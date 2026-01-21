@@ -11,7 +11,7 @@ import {
 	ConversationScrollButton,
 } from '@/components/ai-elements/conversation';
 import { Message, MessageContent } from '@/components/ai-elements/message';
-import { ChatEmptyState, ChatInput, ChatLayout, MessagePartRenderer } from '@/components/chat';
+import { ChatEmptyState, ChatInput, ChatLayout, MemoizedMessage } from '@/components/chat';
 import { useInvalidateThreads } from '@/hooks/use-invalidate-threads';
 import { hasRenderableContent } from '@/lib/chat-utils';
 import { MASTRA_BASE_URL, RESOURCE_ID } from '@/lib/constants';
@@ -183,22 +183,11 @@ function ChatPage() {
 							return (
 								<Message from={message.role} key={message.id}>
 									<MessageContent>
-										{message.parts.map((part, partIndex) => {
-											const hasTextPart = message.parts.some(
-												(p) => p.type === 'text' && 'text' in p && (p.text as string)?.trim()
-											);
-											return (
-												<MessagePartRenderer
-													allParts={message.parts}
-													hasTextPart={hasTextPart}
-													isLastMessage={index === messages.length - 1}
-													key={partIndex}
-													part={part}
-													partIndex={partIndex}
-													status={status}
-												/>
-											);
-										})}
+										<MemoizedMessage
+											isLastMessage={index === messages.length - 1}
+											message={message}
+											status={status}
+										/>
 									</MessageContent>
 								</Message>
 							);

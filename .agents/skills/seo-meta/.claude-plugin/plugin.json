@@ -1,0 +1,12 @@
+{
+  "name": "seo-meta",
+  "description": "Generate complete SEO meta tags for every page. Covers title patterns, meta descriptions, Open Graph, Twitter Cards, and JSON-LD structured data (LocalBusiness, Service, FAQ, BreadcrumbList). Use when: building pages, adding social sharing, implementing structured data, optimizing for search engines.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Dawes",
+    "email": "jeremy@jezweb.net"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jezweb/claude-skills",
+  "keywords": []
+}

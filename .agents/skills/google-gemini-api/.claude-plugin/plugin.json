@@ -1,0 +1,12 @@
+{
+  "name": "google-gemini-api",
+  "description": "Integrate Gemini API with @google/genai SDK (NOT deprecated @google/generative-ai). Text generation, multimodal (images/video/audio/PDFs), function calling, thinking mode, streaming. 1M input tokens. Use when: Gemini integration, multimodal AI, reasoning with thinking mode. Troubleshoot: SDK deprecation, model not found, context window, function calling errors.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Dawes",
+    "email": "jeremy@jezweb.net"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jezweb/claude-skills",
+  "keywords": []
+}

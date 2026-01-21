@@ -1,0 +1,12 @@
+{
+  "name": "tailwind-patterns",
+  "description": "Production-ready Tailwind CSS patterns for common website components: responsive layouts, cards, navigation, forms, buttons, and typography. Includes spacing scale, breakpoints, mobile-first patterns, and dark mode support. Use when building UI components, creating landing pages, styling forms, implementing navigation, or fixing responsive layouts. {/* content */} {/* content */} Click me {/* items */} {/* content */} <div className=max-w-7xl mx-auto px-4 sm:px-6 lg:px-8> {/* content */} </div> ",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Dawes",
+    "email": "jeremy@jezweb.net"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jezweb/claude-skills",
+  "keywords": []
+}

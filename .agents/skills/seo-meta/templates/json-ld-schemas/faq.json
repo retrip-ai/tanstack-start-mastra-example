@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "QUESTION_1",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ANSWER_1"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "QUESTION_2",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ANSWER_2"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "QUESTION_3",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ANSWER_3"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "QUESTION_4",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ANSWER_4"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "QUESTION_5",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ANSWER_5"
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "@context": "https://schema.org",
+  "@type": "BUSINESS_TYPE",
+  "name": "BUSINESS_NAME",
+  "description": "BUSINESS_DESCRIPTION",
+  "@id": "CANONICAL_URL",
+  "url": "WEBSITE_URL",
+  "logo": "LOGO_IMAGE_URL",
+  "image": "MAIN_IMAGE_URL",
+  "telephone": "+61-XXX-XXX-XXX",
+  "email": "EMAIL_ADDRESS",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "STREET_ADDRESS",
+    "addressLocality": "CITY",
+    "addressRegion": "STATE",
+    "postalCode": "POSTAL_CODE",
+    "addressCountry": "AU"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": LATITUDE,
+    "longitude": LONGITUDE
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "07:00",
+      "closes": "17:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Saturday",
+      "opens": "08:00",
+      "closes": "12:00"
+    }
+  ],
+  "sameAs": [
+    "FACEBOOK_URL",
+    "INSTAGRAM_URL",
+    "LINKEDIN_URL"
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "127",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+}

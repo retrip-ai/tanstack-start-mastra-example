@@ -1,0 +1,41 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "SERVICE_NAME",
+  "description": "SERVICE_DESCRIPTION",
+  "serviceType": "SERVICE_TYPE",
+  "provider": {
+    "@type": "BUSINESS_TYPE",
+    "name": "BUSINESS_NAME",
+    "url": "WEBSITE_URL",
+    "telephone": "+61-XXX-XXX-XXX",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "STREET_ADDRESS",
+      "addressLocality": "CITY",
+      "addressRegion": "STATE",
+      "postalCode": "POSTAL_CODE",
+      "addressCountry": "AU"
+    }
+  },
+  "areaServed": {
+    "@type": "City",
+    "name": "CITY_NAME",
+    "containedInPlace": {
+      "@type": "State",
+      "name": "STATE_NAME"
+    }
+  },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceUrl": "SERVICE_PAGE_URL",
+    "servicePhone": "+61-XXX-XXX-XXX"
+  },
+  "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "priceRange": "$$",
+    "priceCurrency": "AUD",
+    "validFrom": "2026-01-01"
+  }
+}
