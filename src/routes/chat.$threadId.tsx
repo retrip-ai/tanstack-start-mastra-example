@@ -11,6 +11,7 @@ import {
 	ConversationScrollButton,
 } from '@/components/ai-elements/conversation';
 import { Message, MessageContent } from '@/components/ai-elements/message';
+import { Shimmer } from '@/components/ai-elements/shimmer';
 import { ChatEmptyState, ChatInput, ChatLayout, MemoizedMessage } from '@/components/chat';
 import { usePageTitle } from '@/components/page-title-context';
 import { useThreads } from '@/hooks/use-threads';
@@ -26,7 +27,7 @@ const chatSearchSchema = z.object({
 export const Route = createFileRoute('/chat/$threadId')({
 	validateSearch: chatSearchSchema,
 	loaderDeps: ({ search }) => ({ isNew: search.new }),
-	loader: async ({ params, context, deps }) => {
+	loader: async ({ params, context, deps, }) => {
 		const { threadId } = params;
 		const isNewChat = deps.isNew === true;
 
@@ -56,6 +57,7 @@ export const Route = createFileRoute('/chat/$threadId')({
 });
 
 function ChatPage() {
+	const navigate = Route.useNavigate();
 	const { threadId } = Route.useParams();
 	const { new: isNewChat } = Route.useSearch();
 	const loaderData = Route.useLoaderData();
@@ -172,6 +174,13 @@ function ChatPage() {
 
 				// Invalidar threads para actualizar la lista en sidebar
 				invalidateThreads(0); // Sin delay, el thread ya existe
+
+				if (isNewChat) {
+					navigate({
+						search: (old) => ({ ...old, new: undefined }),
+						replace: true,
+					});
+				}
 			} else {
 				console.warn('⚠️ Stream ended but only 1 message, possible error - skipping invalidation');
 			}
@@ -179,7 +188,7 @@ function ChatPage() {
 
 		// Actualizar ref para la próxima comparación
 		prevStatusRef.current = currentStatus;
-	}, [status, messages.length, invalidateThreads]);
+	}, [status, messages.length, invalidateThreads, isNewChat, navigate]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -198,22 +207,43 @@ function ChatPage() {
 					{messages.length === 0 ? (
 						<ChatEmptyState />
 					) : (
-						messages.map((message, index) => {
-							// Check if message has any renderable content
-							if (!hasRenderableContent(message as any)) return null;
+						<>
+							{messages.map((message, index) => {
+								// Check if message has any renderable content
+								if (!hasRenderableContent(message as any)) return null;
 
-							return (
-								<Message from={message.role} key={message.id}>
-									<MessageContent>
-										<MemoizedMessage
-											isLastMessage={index === messages.length - 1}
-											message={message}
-											status={status}
-										/>
-									</MessageContent>
-								</Message>
-							);
-						})
+								return (
+									<Message from={message.role} key={message.id}>
+										<MessageContent>
+											<MemoizedMessage
+												isLastMessage={index === messages.length - 1}
+												message={message}
+												status={status}
+											/>
+										</MessageContent>
+									</Message>
+								);
+							})}
+							{(() => {
+								const lastMessage = messages[messages.length - 1];
+								const shouldShowShimmer =
+									status === 'submitted' ||
+									(status === 'streaming' &&
+										(!lastMessage ||
+											lastMessage.role === 'user' ||
+											(lastMessage.role === 'assistant' &&
+												!hasRenderableContent(lastMessage as any))));
+
+								if (shouldShowShimmer) {
+									return (
+										<div className="px-4 py-2">
+											<Shimmer>Trabajando...</Shimmer>
+										</div>
+									);
+								}
+								return null;
+							})()}
+						</>
 					)}
 				</ConversationContent>
 				<ConversationScrollButton />
